@@ -6,16 +6,11 @@ let nEnv = {
 	nId: 0,
 	notes: {},
 	cursorCoords: {x: undefined, y: undefined},
-	deltas: {x: 0, y: 0},
 	__noteCreated: function(note) {
 		this.notes[this.nId] = note;
 		this.nId++;
 	},
 	setCoords: function(coords) {
-		if (typeof this.cursorCoords.x != "undefined") {
-			this.deltas.x = this.cursorCoords.x - coords.x;
-			this.deltas.y = this.cursorCoords.y - coords.y;
-		}
 		this.cursorCoords = coords;
 	}
 }
@@ -23,7 +18,6 @@ let nEnv = {
 class Note {
 	constructor(text, coords, container) {
 		this.dragging = false;
-		this.coords = coords;
 		this._draggingInterval = undefined;
 		this.text = text;		
 		this.container = container;
@@ -35,17 +29,7 @@ class Note {
 		console.log("EVENTS SET");
 		const mdFn = event => {
 			this.dragging = true;
-			this._draggingInterval = setInterval(() => {
-				if (this.dragging) {
-					const deltaX = nEnv.deltas.x;
-					const deltaY = nEnv.deltas.y;
-					this.coords.x += deltaX;
-					this.coords.y += deltaY;
-					console.log(deltaX, deltaY);
-					element.style.top = this.coords.y+"px";
-					element.style.left = this.coords.x+"px";
-				}
-			},1);
+			this.coords = {x: event.clientX, y: event.clientY};
 		};
 
 		const muFn = event => {
@@ -53,6 +37,10 @@ class Note {
 			clearInterval(this._draggingInterval);
 		};
 
+		this._draggingInterval = setInterval(() => {
+			element.style.top = event.clientY;
+			element.style.left = event.clientX;
+		},1);
 
 		element.addEventListener("mousedown",mdFn);
 		element.addEventListener("mouseup",muFn);
@@ -158,7 +146,6 @@ for(const wall of walls) {
 
 	const mmFn = event => nEnv.setCoords({x: event.clientX, y: event.clientY});
 
-	wall.addEventListener("mousemove",mmFn);
 	wall.addEventListener("contextmenu",clickFn);
 
 }
