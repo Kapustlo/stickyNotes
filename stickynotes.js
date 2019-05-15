@@ -2,34 +2,48 @@
 	Created by Kapustlo
 */
 
-let nInv = {
+let nEnv = {
 	nId: 0,
 	notes: {},
+	cursorCoords: {x: undefined, y: undefined},
 	__noteCreated: function(note) {
 		this.notes[this.nId] = note;
 		this.nId++;
+	},
+	setCoords: function(coords) {
+		this.cursorCoords = coords;
 	}
 }
 
 class Note {
 	constructor(text, coords, container) {
-		this.mouseDown = false;
+		this.dragging = false;
+		this._draggingInterval = undefined;
 		this.text = text;		
 		this.container = container;
-		this.coords = coords;
-		console.log(coords, "COORDS");
 		this.__appear(coords, container);
-		nInv.__noteCreated(this);
+		nEnv.__noteCreated(this);
 	}
 
 	__setEvents(element) {
-		const mdFn = event => this.mouseDown = true;
+		console.log("EVENTS SET");
+		const mdFn = event => {
+			this.dragging = true;
+			this.coords = {x: event.clientX, y: event.clientY};
+		};
 
-		const muFn = event => this.mouseDown = false;
+		const muFn = event => {
+			this.dragging = false
+			clearInterval(this._draggingInterval);
+		};
 
-		const moFn = event => {}
+		this._draggingInterval = setInterval(() => {
+			element.style.top = event.clientY;
+			element.style.left = event.clientX;
+		},1);
 
-		element.addEventListener("mouseover", moFn);
+		element.addEventListener("mousedown",mdFn);
+		element.addEventListener("mouseup",muFn);
 	}
 
 	__appear(coords, container) {
@@ -38,7 +52,8 @@ class Note {
 		note.style.top = coords.y+"px";
 		note.style.left = coords.x+"px";
 		note.innerHTML = `<p>${this.text}</p>`;
-		console.log(note.style.top, coords.y, "COORDS Y");
+		console.log(this.text);
+		this.__setEvents(note);
 		container.appendChild(note);
 	}
 
@@ -80,12 +95,14 @@ let menu = {
 	__addEvents(element) {
 		const button = element.getElementsByTagName("button")[0];
 		const input = element.getElementsByTagName("input")[0];
+
 		const clickFn = event => {
-			const text = input.value;
 			event.preventDefault();
+			const text = input.value;
 			this._close();
 			new Note(text, this.coords, this.__container);
 		}
+
 		button.addEventListener("click",clickFn);
 	},
 	_show: function(coords, wall) {
@@ -126,5 +143,9 @@ for(const wall of walls) {
 
 		menu.toggle({x: xPos, y: yPos}, wall);
 	}
+
+	const mmFn = event => nEnv.setCoords({x: event.clientX, y: event.clientY});
+
 	wall.addEventListener("contextmenu",clickFn);
+
 }
