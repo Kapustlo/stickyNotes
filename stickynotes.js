@@ -13,12 +13,23 @@ let nInv = {
 
 class Note {
 	constructor(text, coords, container) {
+		this.mouseDown = false;
 		this.text = text;		
 		this.container = container;
 		this.coords = coords;
 		console.log(coords, "COORDS");
 		this.__appear(coords, container);
 		nInv.__noteCreated(this);
+	}
+
+	__setEvents(element) {
+		const mdFn = event => this.mouseDown = true;
+
+		const muFn = event => this.mouseDown = false;
+
+		const moFn = event => {}
+
+		element.addEventListener("mouseover", moFn);
 	}
 
 	__appear(coords, container) {
@@ -30,6 +41,7 @@ class Note {
 		console.log(note.style.top, coords.y, "COORDS Y");
 		container.appendChild(note);
 	}
+
 }
 
 let menu = {
