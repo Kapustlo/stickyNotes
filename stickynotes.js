@@ -80,7 +80,7 @@ let menu = {
 	__addEvents(element) {
 		const button = element.getElementsByTagName("button")[0];
 		const input = element.getElementsByTagName("input")[0];
-		const clickFn = (event) => {
+		const clickFn = event => {
 			const text = input.value;
 			event.preventDefault();
 			this._close();
@@ -113,7 +113,7 @@ let menu = {
 }
 const walls = document.getElementsByClassName("n-wall");
 for(const wall of walls) {
-	const clickFn = (event) => {
+	const clickFn = event => {
 		event.preventDefault();
 
 		let xPos = event.clientX;
