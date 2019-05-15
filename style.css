@@ -66,6 +66,7 @@ body
 	min-width: 100px;
 	display: inline-block;
 	position: absolute;
+	cursor: pointer;
 	padding: 1rem;
 	text-align: center;
 	border-radius: .25rem;
